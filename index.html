@@ -1,0 +1,508 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tareas 7C LDC</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      margin: 0; padding: 0;
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+    header {
+      background: #34495e;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+    main {
+      flex: 1;
+      padding: 1rem 2rem;
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #34495e;
+      margin-bottom: 0.5rem;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 1rem;
+      display: block;
+    }
+    input[type=text], input[type=password], textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #2980b9;
+      color: white;
+      padding: 0.5rem 1rem;
+      margin-top: 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #1c5980;
+    }
+    .btn-secondary {
+      background-color: #27ae60;
+    }
+    .btn-secondary:hover {
+      background-color: #1e8449;
+    }
+    .btn-danger {
+      background-color: #c0392b;
+    }
+    .btn-danger:hover {
+      background-color: #922b21;
+    }
+    .task {
+      border: 1px solid #ddd;
+      padding: 0.8rem;
+      margin-bottom: 0.6rem;
+      border-radius: 5px;
+      background: #ecf0f1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .task.completed {
+      background: #d4efdf;
+      text-decoration: line-through;
+      color: #555;
+    }
+    .task-info {
+      flex-grow: 1;
+    }
+    .filters, .subjects {
+      margin: 1rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .filters button, .subjects button {
+      flex-grow: 1;
+      min-width: 100px;
+    }
+    .search-bar {
+      margin: 1rem 0;
+    }
+    .hidden {
+      display: none !important;
+    }
+    #mensajeria {
+      margin-top: 2rem;
+      padding: 1rem;
+      border: 2px solid #2980b9;
+      border-radius: 8px;
+      background: #eaf2f8;
+    }
+  </style>
+
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init('2kzeC_wiws1InpMyP');
+    })();
+  </script>
+</head>
+<body>
+
+<header>Tareas 7C LDC</header>
+
+<main>
+
+  <!-- Login / Register -->
+  <section id="auth-section">
+    <h2>Iniciar sesión</h2>
+    <label for="username">Usuario:</label>
+    <input type="text" id="username" autocomplete="username" />
+    <label for="password">Contraseña:</label>
+    <input type="password" id="password" autocomplete="current-password" />
+    <button id="login-btn">Iniciar sesión</button>
+    <p>¿No tienes cuenta? <button id="show-register" style="background:none; color:#2980b9; border:none; cursor:pointer; padding:0;">Registrarse</button></p>
+  </section>
+
+  <section id="register-section" class="hidden">
+    <h2>Registro de usuario</h2>
+    <label for="reg-username">Usuario:</label>
+    <input type="text" id="reg-username" />
+    <label for="reg-password">Contraseña:</label>
+    <input type="password" id="reg-password" />
+    <button id="register-btn" class="btn-secondary">Registrar</button>
+    <button id="cancel-register" style="margin-left: 1rem;">Cancelar</button>
+  </section>
+
+  <!-- Panel de tareas (visible tras login) -->
+  <section id="tasks-section" class="hidden">
+
+    <div style="display:flex; justify-content: space-between; align-items: center;">
+      <h2>Tareas</h2>
+      <button id="logout-btn" style="background:#c0392b;">Cerrar sesión</button>
+    </div>
+
+    <div class="filters">
+      <button id="btn-all">Todas</button>
+      <button id="btn-pending">Pendientes</button>
+      <button id="btn-completed">Completadas</button>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Buscar tareas..." />
+    </div>
+
+    <div class="subjects">
+      <button data-subject="Biology">Biology</button>
+      <button data-subject="Filosofía">Filosofía</button>
+      <button data-subject="L.Arts">L.Arts</button>
+      <button data-subject="Religión">Religión</button>
+      <button data-subject="C.Events">C.Events</button>
+      <button data-subject="Geo y Est">Geo y Est</button>
+      <button data-subject="L.Castellana">L.Castellana</button>
+      <button data-subject="S.Studies">S.Studies</button>
+      <button data-subject="Ed. Física">Ed. Física</button>
+      <button data-subject="Informática">Informática</button>
+      <button data-subject="Matemáticas">Matemáticas</button>
+      <button data-subject="Sociales">Sociales</button>
+    </div>
+
+    <!-- Solo para administrador: agregar tarea -->
+    <section id="add-task-section" class="hidden" style="margin-top: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 8px;">
+      <h3>Agregar nueva tarea</h3>
+      <label for="task-subject">Asignatura:</label>
+      <select id="task-subject">
+        <option value="Biology">Biology</option>
+        <option value="Filosofía">Filosofía</option>
+        <option value="L.Arts">L.Arts</option>
+        <option value="Religión">Religión</option>
+        <option value="C.Events">C.Events</option>
+        <option value="Geo y Est">Geo y Est</option>
+        <option value="L.Castellana">L.Castellana</option>
+        <option value="S.Studies">S.Studies</option>
+        <option value="Ed. Física">Ed. Física</option>
+        <option value="Informática">Informática</option>
+        <option value="Matemáticas">Matemáticas</option>
+        <option value="Sociales">Sociales</option>
+      </select>
+      <label for="task-desc">Descripción:</label>
+      <textarea id="task-desc" rows="3"></textarea>
+      <label for="task-priority">Prioridad:</label>
+      <select id="task-priority">
+        <option value="Alta">Alta</option>
+        <option value="Media">Media</option>
+        <option value="Baja">Baja</option>
+      </select>
+      <button id="add-task-btn" class="btn-secondary">Agregar tarea</button>
+    </section>
+
+    <!-- Lista de tareas -->
+    <section id="tasks-list" style="margin-top: 1rem;"></section>
+
+    <!-- Mensajería -->
+    <section id="mensajeria" style="margin-top: 2rem; padding: 1rem; border: 2px solid #2980b9; border-radius: 8px; background: #eaf2f8;">
+      <h3>Enviar mensaje al administrador</h3>
+      <textarea id="message" placeholder="Escribe tu mensaje aquí..." rows="4"></textarea><br />
+      <button onclick="sendMessage()">Enviar mensaje</button>
+    </section>
+
+  </section>
+
+</main>
+
+<script>
+  // Usuarios guardados en localStorage (solo para demo)
+  // admin: SambaSamue / LDC
+  // usuarios normales se guardan con "user_" + username
+  const ADMIN_USER = "SambaSamue";
+  const ADMIN_PASS = "LDC";
+
+  // Estado app
+  let currentUser = null;
+  let tasks = JSON.parse(localStorage.getItem("tasks7C")) || [];
+  let filteredTasks = [...tasks];
+
+  // DOM references
+  const authSection = document.getElementById("auth-section");
+  const registerSection = document.getElementById("register-section");
+  const tasksSection = document.getElementById("tasks-section");
+  const loginBtn = document.getElementById("login-btn");
+  const logoutBtn = document.getElementById("logout-btn");
+  const showRegisterBtn = document.getElementById("show-register");
+  const registerBtn = document.getElementById("register-btn");
+  const cancelRegisterBtn = document.getElementById("cancel-register");
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const regUsernameInput = document.getElementById("reg-username");
+  const regPasswordInput = document.getElementById("reg-password");
+  const tasksList = document.getElementById("tasks-list");
+  const addTaskSection = document.getElementById("add-task-section");
+  const addTaskBtn = document.getElementById("add-task-btn");
+  const taskSubject = document.getElementById("task-subject");
+  const taskDesc = document.getElementById("task-desc");
+  const taskPriority = document.getElementById("task-priority");
+  const btnAll = document.getElementById("btn-all");
+  const btnPending = document.getElementById("btn-pending");
+  const btnCompleted = document.getElementById("btn-completed");
+  const searchInput = document.getElementById("search-input");
+  const subjectsButtons = document.querySelectorAll(".subjects button");
+
+  // Guarda usuarios normales en localStorage (clave: "user_"+username)
+  function saveUser(username, password) {
+    localStorage.setItem("user_" + username, JSON.stringify({ username, password }));
+  }
+  function getUser(username) {
+    const data = localStorage.getItem("user_" + username);
+    return data ? JSON.parse(data) : null;
+  }
+
+  function showSection(section) {
+    authSection.classList.add("hidden");
+    registerSection.classList.add("hidden");
+    tasksSection.classList.add("hidden");
+    section.classList.remove("hidden");
+  }
+
+  function login() {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!username || !password) {
+      alert("Por favor completa usuario y contraseña.");
+      return;
+    }
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+      currentUser = { username, admin: true };
+      showSection(tasksSection);
+      setupForAdmin();
+    } else {
+      const user = getUser(username);
+      if (user && user.password === password) {
+        currentUser = { username, admin: false };
+        showSection(tasksSection);
+        setupForUser();
+      } else {
+        alert("Usuario o contraseña incorrectos.");
+      }
+    }
+    usernameInput.value = "";
+    passwordInput.value = "";
+    renderTasks();
+  }
+
+  function logout() {
+    currentUser = null;
+    showSection(authSection);
+  }
+
+  function showRegister() {
+    showSection(registerSection);
+  }
+  function cancelRegister() {
+    showSection(authSection);
+  }
+  function registerUser() {
+    const username = regUsernameInput.value.trim();
+    const password = regPasswordInput.value.trim();
+    if (!username || !password) {
+      alert("Completa usuario y contraseña para registrar.");
+      return;
+    }
+    if (username === ADMIN_USER) {
+      alert("Este usuario está reservado.");
+      return;
+    }
+    if (getUser(username)) {
+      alert("El usuario ya existe.");
+      return;
+    }
+    saveUser(username, password);
+    alert("Usuario registrado correctamente. Ahora inicia sesión.");
+    regUsernameInput.value = "";
+    regPasswordInput.value = "";
+    showSection(authSection);
+  }
+
+  function setupForAdmin() {
+    addTaskSection.classList.remove("hidden");
+  }
+  function setupForUser() {
+    addTaskSection.classList.add("hidden");
+  }
+
+  function saveTasks() {
+    localStorage.setItem("tasks7C", JSON.stringify(tasks));
+  }
+
+  function addTask() {
+    const subject = taskSubject.value;
+    const desc = taskDesc.value.trim();
+    const priority = taskPriority.value;
+    if (!desc) {
+      alert("La descripción de la tarea no puede estar vacía.");
+      return;
+    }
+    tasks.push({
+      id: Date.now(),
+      subject,
+      desc,
+      priority,
+      completed: false
+    });
+    saveTasks();
+    taskDesc.value = "";
+    renderTasks();
+  }
+
+  function renderTasks(filter = "all", subjectFilter = null, searchTerm = "") {
+    filteredTasks = tasks.filter(t => {
+      if (filter === "pending" && t.completed) return false;
+      if (filter === "completed" && !t.completed) return false;
+      if (subjectFilter && t.subject !== subjectFilter) return false;
+      if (searchTerm && !t.desc.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+      return true;
+    });
+
+    tasksList.innerHTML = "";
+    if (filteredTasks.length === 0) {
+      tasksList.innerHTML = "<p>No hay tareas que mostrar.</p>";
+      return;
+    }
+    filteredTasks.forEach(task => {
+      const div = document.createElement("div");
+      div.className = "task" + (task.completed ? " completed" : "");
+      div.innerHTML = `
+        <div class="task-info">
+          <strong>[${task.subject}]</strong> (${task.priority}) - ${task.desc}
+        </div>
+        <div>
+          ${!task.completed ? `<button class="btn-secondary" data-id="${task.id}">Marcar como hecha</button>` : ""}
+          ${currentUser.admin ? `<button class="btn-danger" data-id="${task.id}">Eliminar</button>` : ""}
+        </div>
+      `;
+      tasksList.appendChild(div);
+    });
+
+    // Eventos botones
+    tasksList.querySelectorAll("button.btn-secondary").forEach(btn => {
+      btn.onclick = () => {
+        const id = Number(btn.dataset.id);
+        markCompleted(id);
+      };
+    });
+    tasksList.querySelectorAll("button.btn-danger").forEach(btn => {
+      btn.onclick = () => {
+        const id = Number(btn.dataset.id);
+        deleteTask(id);
+      };
+    });
+  }
+
+  function markCompleted(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      task.completed = true;
+      saveTasks();
+      renderTasks();
+    }
+  }
+  function deleteTask(id) {
+    if (!currentUser.admin) return;
+    tasks = tasks.filter(t => t.id !== id);
+    saveTasks();
+    renderTasks();
+  }
+
+  // Filtros
+  btnAll.onclick = () => renderTasks("all");
+  btnPending.onclick = () => renderTasks("pending");
+  btnCompleted.onclick = () => renderTasks("completed");
+
+  // Buscador
+  searchInput.oninput = () => {
+    const filter = btnPending.classList.contains("active") ? "pending" : btnCompleted.classList.contains("active") ? "completed" : "all";
+    renderTasks(filter, null, searchInput.value.trim());
+  };
+
+  // Filtrar por asignatura
+  subjectsButtons.forEach(btn => {
+    btn.onclick = () => {
+      const subject = btn.dataset.subject;
+      renderTasks("all", subject, searchInput.value.trim());
+    };
+  });
+
+  // Login/Register events
+  loginBtn.onclick = login;
+  logoutBtn.onclick = logout;
+  showRegisterBtn.onclick = showRegister;
+  cancelRegisterBtn.onclick = cancelRegister;
+  registerBtn.onclick = registerUser;
+  addTaskBtn.onclick = addTask;
+
+  // Para saber qué filtro está activo (estilo botón activo)
+  function clearActiveFilters() {
+    btnAll.classList.remove("active");
+    btnPending.classList.remove("active");
+    btnCompleted.classList.remove("active");
+  }
+  btnAll.onclick = () => {
+    clearActiveFilters();
+    btnAll.classList.add("active");
+    renderTasks("all", null, searchInput.value.trim());
+  };
+  btnPending.onclick = () => {
+    clearActiveFilters();
+    btnPending.classList.add("active");
+    renderTasks("pending", null, searchInput.value.trim());
+  };
+  btnCompleted.onclick = () => {
+    clearActiveFilters();
+    btnCompleted.classList.add("active");
+    renderTasks("completed", null, searchInput.value.trim());
+  };
+
+  // Inicializamos
+  showSection(authSection);
+  btnAll.classList.add("active");
+  renderTasks();
+
+  // Enviar mensaje EmailJS
+  function sendMessage() {
+    const msg = document.getElementById("message").value.trim();
+    if (!msg) {
+      alert("Por favor escribe un mensaje.");
+      return;
+    }
+    emailjs.send("service_irby2kv", "template_5qlynhj", {
+      message: msg,
+      user: currentUser ? currentUser.username : "Invitado",
+      site: "Tareas 7C LDC"
+    }).then(() => {
+      alert("✅ Mensaje enviado correctamente al administrador.");
+      document.getElementById("message").value = "";
+    }, (error) => {
+      console.error("EmailJS error:", error);
+      alert("❌ Hubo un error al enviar el mensaje. Inténtalo más tarde.");
+    });
+  }
+
+</script>
+
+</body>
+</html>
